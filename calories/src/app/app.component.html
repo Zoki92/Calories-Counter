@@ -1,0 +1,19 @@
+<div class="ui container">
+  <div class="ui secondary pointing menu">
+    <a class="item" routerLink="/home" routerLinkActive="active">
+      Home
+    </a>
+    <div class="right menu">
+      <ng-container *ngIf="user">
+        <a class="ui item" (click)="logout()">
+          Logout
+        </a>
+      </ng-container>
+      <a class="ui item" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        Login
+      </a>
+    </div>
+  </div>
+  <app-alert></app-alert>
+  <router-outlet></router-outlet>
+</div>
