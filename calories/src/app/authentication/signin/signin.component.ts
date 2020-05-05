@@ -38,24 +38,21 @@ export class SigninComponent implements OnInit {
   }
 
   onSubmit() {
-    // this.submitted = true;
-    // this.alertService.clear();
+    this.submitted = true;
+    this.alertService.clear();
 
     if (this.authForm.invalid) {
-      console.log("here");
-      console.log(this.authForm.errors);
       return;
     }
     this.loading = true;
     return this.authService.signin(this.authForm.value).subscribe({
       next: () => {
-        this.alertService.success("You have signed in!");
+        this.alertService.success("You have signed in!", { keepAfterRouteChange: true, autoClose: true });
         this.router.navigateByUrl('/home')
       },
       error: ({ error }) => {
-        this.alertService.error(error);
-
-        if (error.email || error.password) {
+        this.alertService.error(error.non_field_errors);
+        if (error.non_field_errors) {
           this.authForm.setErrors({
             credentials: true
           });

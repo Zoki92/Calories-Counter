@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { User } from './authentication/user';
 import { AuthService } from './authentication/auth.service';
 import { Router } from '@angular/router';
+import { AlertService } from './shared/alert.service';
 
 @Component({
   selector: 'app-root',
@@ -12,15 +13,17 @@ export class AppComponent {
   title = 'calories';
   user: User;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router, private alertService: AlertService) {
     this.authService.user.subscribe(x => this.user = x);
-    console.log("user ", this.user);
+
     if (this.user) {
+      const { isExpired } = this.authService.checkToken();
       this.router.navigateByUrl('/home')
     }
   }
 
   logout() {
+    this.alertService.success("You have logged out!", { keepAfterRouteChange: true, fade: true });
     this.authService.logout();
   }
 

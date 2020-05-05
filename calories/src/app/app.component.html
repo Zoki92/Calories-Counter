@@ -9,9 +9,14 @@
           Logout
         </a>
       </ng-container>
-      <a class="ui item" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        Login
-      </a>
+      <ng-container *ngIf="!user">
+        <a class="ui item" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          Login
+        </a>
+        <a class="ui item" routerLink="/signup" routerLinkActive="active">
+          Register
+        </a>
+      </ng-container>
     </div>
   </div>
   <app-alert></app-alert>

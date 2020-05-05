@@ -3,13 +3,17 @@ import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
-  HttpInterceptor
+  HttpInterceptor,
+  HttpErrorResponse
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
+import { switchMap, filter, take, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class JwtInterceptorInterceptor implements HttpInterceptor {
+  private isRefreshing = false;
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(private authService: AuthService) { }
 
@@ -17,13 +21,47 @@ export class JwtInterceptorInterceptor implements HttpInterceptor {
     const user = this.authService.userValue;
     const isLoggedIn = user && user.token;
     if (isLoggedIn) {
-      request = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${user.token}`
-        }
-      });
+      request = this.addToken(request, user.token);
     }
+    return next.handle(request).pipe(
+      catchError(error => {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          return this.handle401Error(request, next);
+        } else {
+          return throwError(error);
+        }
+      }));
+  }
 
-    return next.handle(request);
+  private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshTokenSubject.next(null);
+      return this.authService.refreshToken().pipe(
+        switchMap((token: any) => {
+          console.log("HERE 1 : ", token);
+          this.isRefreshing = false;
+          this.refreshTokenSubject.next(token);
+          return next.handle(this.addToken(request, token));
+        })
+      );
+    }
+    else {
+      return this.refreshTokenSubject.pipe(
+        filter(token => token != null),
+        take(1),
+        switchMap(token => {
+          return next.handle(this.addToken(request, token));
+        })
+      )
+    }
+  }
+
+  private addToken(request: HttpRequest<any>, token: string) {
+    return request.clone({
+      setHeaders: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
   }
 }

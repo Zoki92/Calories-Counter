@@ -1,0 +1,21 @@
+<h3>Sign Up</h3>
+<form (ngSubmit)="onSubmit()" class="ui form" [formGroup]="authForm">
+    <app-input inputType="text" label="Email" [control]="authForm.get('email')"></app-input>
+    <app-input inputType="password" label="Password" [control]="authForm.get('password')"></app-input>
+    <app-input inputType="password" label="Password" [control]="authForm.get('password2')"></app-input>
+
+    <div *ngIf="authForm.errors" class="ui red basic label">
+        <p *ngIf="authForm.errors.passwordsDontMatch">
+            Passwords do not match.
+        </p>
+        <p *ngIf="authForm.errors.unknownError">
+            Oops...Something went wrong.
+        </p>
+        <p *ngIf="authForm.errors.noConnection">
+            Sorry, you have to be online to signup.
+        </p>
+    </div>
+    <div>
+        <button [disabled]="authForm.invalid" class="ui submit button primary">Submit</button>
+    </div>
+</form>

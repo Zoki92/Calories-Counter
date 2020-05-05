@@ -98,3 +98,24 @@ class AuthRegisterUserTest(AuthBaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         users = User.objects.all()
         self.assertEqual(users.count(), 1)
+
+    def test_validate_email_view(self):
+        """
+        Testing the get method for auth_register
+        which tests whether email is unique
+        or not
+        """
+        # user exists
+        response = self.client.get(
+            self.url,
+            {'email': 'zoran@123.com'}
+        )
+
+        self.assertFalse(response.data["available"])
+
+        # email not used yet
+        response = self.client.get(
+            self.url,
+            {'email': 'zoran123@123.com'}
+        )
+        self.assertTrue(response.data["available"])

@@ -1,4 +1,7 @@
-<div *ngFor="let alert of alerts" class="{{cssClass(alert)}}">
-    <a class="close" (click)="removeAlert(alert)">&times;</a>
-    <span [innerHTML]="alert.message"></span>
+<div *ngFor="let alert of alerts" class="{{cssClass(alert)['classes']}}">
+    <i (click)="removeAlert(alert)" class="close icon"></i>
+    <div class="header">
+        {{ cssClass(alert)['header'] }}
+    </div>
+    <p>{{ alert.message }}</p>
 </div>

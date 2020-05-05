@@ -48,6 +48,11 @@ export class AlertComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.alertSubscription.unsubscribe();
+    this.routeSubscription.unsubscribe();
+  }
+
   removeAlert(alert: Alert) {
     // check if already removed to prevent error on auto close
     if (!this.alerts.includes(alert)) return;
@@ -72,18 +77,19 @@ export class AlertComponent implements OnInit {
     const classes = [];
 
     const alertTypeClass = {
-      [AlertType.Success]: 'ui green message',
-      [AlertType.Error]: 'ui red message',
-      [AlertType.Info]: 'ui blue message',
-      [AlertType.Warning]: 'ui yellow message'
+      [AlertType.Success]: { class: 'ui green message', header: 'Success!' },
+      [AlertType.Error]: { class: 'ui red message', header: 'Error!' },
+      [AlertType.Info]: { class: 'ui blue message', header: 'Info!' },
+      [AlertType.Warning]: { class: 'ui yellow message', header: 'Warning!' },
     }
 
-    classes.push(alertTypeClass[alert.type]);
+    classes.push(alertTypeClass[alert.type]['class']);
 
     if (alert.fade) {
       classes.push('fade');
     }
-    return classes.join(' ');
+
+    return { classes: classes.join(' '), header: alertTypeClass[alert.type]['header'] };
   }
 
 }

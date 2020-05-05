@@ -31,6 +31,7 @@ export class AlertService {
   }
 
   alert(alert: Alert) {
+    console.log("here ", alert);
     alert.id = alert.id || this.defaultId;
     this.subject.next(alert);
   }

@@ -4,11 +4,20 @@ import { tap, catchError, shareReplay } from 'rxjs/operators';
 import { BehaviorSubject, throwError, Observable } from 'rxjs';
 import { User } from './user';
 import { Router } from '@angular/router';
+import { JwtHelperService } from "@auth0/angular-jwt";
 
 interface SigninCredentials {
   email: string,
   password: string,
 }
+
+interface RegisterCredentials {
+  email: string,
+  password: string,
+  password2: string,
+}
+
+const jwtHelper = new JwtHelperService();
 
 @Injectable({
   providedIn: 'root'
@@ -24,19 +33,14 @@ export class AuthService {
   private userSubject: BehaviorSubject<User>;
   public user: Observable<User>;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {
+
     this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
     this.user = this.userSubject.asObservable();
-  }
 
-  handleError(error: HttpErrorResponse) {
-    if (error.error instanceof ErrorEvent) {
-      console.log("an error occured ", error.error.message);
-    }
-    else {
-      console.error(`Backend returned code ${error.status}`, `body was: ${error.error}`);
-    }
-    return throwError("Something happened. Please try again later");
   }
 
   signin(credentials: SigninCredentials) {
@@ -48,16 +52,23 @@ export class AuthService {
       )
       .pipe(
         tap(response => {
-          const user = {
-            'email': credentials.email,
-            'token': response.token
-          }
+          const user = new User({ email: credentials.email, token: response.token });
           localStorage.setItem('user', JSON.stringify(user));
           this.userSubject.next(user);
         }),
-        shareReplay(),
-        catchError(this.handleError),
       );
+  }
+
+  register(credentials: RegisterCredentials) {
+    const { email, password } = credentials;
+    return this.http.post<{ token: string }>(`${this.rootUrl}/auth/register/`, { email, password }, this.httpOptions).pipe(
+      tap(response => {
+        console.log(response)
+        const user = new User({ email: credentials.email, token: response.token });
+        localStorage.setItem('user', JSON.stringify(user));
+        this.userSubject.next(user);
+      })
+    );
   }
 
   logout() {
@@ -66,9 +77,39 @@ export class AuthService {
     this.router.navigate(['/']);
   }
 
+  emailAvailable(email: string) {
+    return this.http.get<{ available: boolean }>(`${this.rootUrl}/auth/register/?email=${email}`);
+  }
+
   public get userValue(): User {
     return this.userSubject.value;
   }
 
+  checkToken() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      const myRawToken = user.token;
+      const decodedToken = jwtHelper.decodeToken(myRawToken);
+      const expirationDate = jwtHelper.getTokenExpirationDate(myRawToken);
+      const isExpired = jwtHelper.isTokenExpired(myRawToken);
+      return { decodedToken, expirationDate, isExpired };
+    }
+    return null;
+  }
+
+  refreshToken() {
+    let credentials = null;
+    if (this.userValue) {
+      const { token, refreshToken } = this.userValue;
+      credentials = refreshToken ? refreshToken : token;
+      return this.http.post<{ token: string }>(`${this.rootUrl}/api-token-refresh/`, { credentials }, this.httpOptions).pipe(
+        tap(response => {
+          const user = new User({ ...this.userValue, refreshToken: response.token });
+          localStorage.setItem('user', JSON.stringify(user));
+        })
+      );
+    }
+
+  }
 
 }
