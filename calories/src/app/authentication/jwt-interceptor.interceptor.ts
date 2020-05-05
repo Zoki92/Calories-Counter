@@ -39,10 +39,13 @@ export class JwtInterceptorInterceptor implements HttpInterceptor {
       this.refreshTokenSubject.next(null);
       return this.authService.refreshToken().pipe(
         switchMap((token: any) => {
-          console.log("HERE 1 : ", token);
           this.isRefreshing = false;
           this.refreshTokenSubject.next(token);
           return next.handle(this.addToken(request, token));
+        }),
+        catchError(err => {
+          this.authService.logout();
+          return throwError(err);
         })
       );
     }

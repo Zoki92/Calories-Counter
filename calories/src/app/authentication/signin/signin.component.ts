@@ -47,8 +47,8 @@ export class SigninComponent implements OnInit {
     this.loading = true;
     return this.authService.signin(this.authForm.value).subscribe({
       next: () => {
-        this.alertService.success("You have signed in!", { keepAfterRouteChange: true, autoClose: true });
         this.router.navigateByUrl('/home')
+        this.alertService.success("You have signed in!", { keepAfterRouteChange: true, autoClose: true });
       },
       error: ({ error }) => {
         this.alertService.error(error.non_field_errors);

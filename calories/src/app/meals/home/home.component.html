@@ -1,1 +1,15 @@
-<p>home works!</p>
+<div class="ui celled list">
+    <div *ngFor="let meal of meals" class="item">
+        <!-- <a [routerLink]="email.id" routerLinkActive="active">
+            
+        </a> -->
+        <div class="content">
+            <div class="header">
+                {{ meal.text }}
+            </div>
+            <p>
+                {{ meal.num_calories }}
+            </p>
+        </div>
+    </div>
+</div>
