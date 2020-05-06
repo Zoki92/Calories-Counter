@@ -51,14 +51,14 @@ class BaseViewTest(APITestCase):
         """
         # get a token from DRF
         response = self.client.post(
-            reverse('create_token'),
+            reverse('token_obtain_pair'),
             data=json.dumps({
                 'email': email,
                 'password': password,
             }),
             content_type="application/json"
         )
-        self.token = response.data['token']
+        self.token = response.data['access']
         self.client.credentials(
             HTTP_AUTHORIZATION=f"Bearer {self.token}"
         )

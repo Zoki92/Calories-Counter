@@ -9,7 +9,8 @@ class TokenSerializer(serializers.Serializer):
     """
     This serializer serializes the token data
     """
-    token = serializers.CharField(max_length=255)
+    access = serializers.CharField(max_length=255)
+    refresh = serializers.CharField(max_length=255)
 
 
 class UserSerializer(serializers.ModelSerializer):

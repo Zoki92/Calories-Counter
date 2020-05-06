@@ -24,20 +24,6 @@ class AuthBaseViewTest(APITestCase):
         }), content_type="application/json")
 
 
-class AuthLoginUserTest(AuthBaseViewTest):
-    """
-    Tests for auth/login endpoint
-    """
-
-    def test_login_user_with_valid_credentials(self):
-        response = self.login_user("zoran@123.com", "123456")
-        self.assertIn('token', response.data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # test login with invalid credentials
-        response = self.login_user("anonymous", "pass")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
 class AuthRegisterUserTest(AuthBaseViewTest):
     """
