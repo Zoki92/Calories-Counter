@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { tap, catchError, shareReplay } from 'rxjs/operators';
 import { BehaviorSubject, throwError, Observable } from 'rxjs';
 import { User } from './user';
@@ -45,14 +45,14 @@ export class AuthService {
 
   signin(credentials: SigninCredentials) {
     return this.http
-      .post<{ token: string }>(
-        `${this.rootUrl}/api-token-auth/`,
+      .post<{ access: string, refresh: string }>(
+        `${this.rootUrl}/api/token/`,
         credentials,
         this.httpOptions
       )
       .pipe(
         tap(response => {
-          const user = new User({ email: credentials.email, token: response.token });
+          const user = new User({ email: credentials.email, token: response.access, refreshToken: response.refresh });
           localStorage.setItem('user', JSON.stringify(user));
           this.userSubject.next(user);
         }),
@@ -61,10 +61,9 @@ export class AuthService {
 
   register(credentials: RegisterCredentials) {
     const { email, password } = credentials;
-    return this.http.post<{ token: string }>(`${this.rootUrl}/auth/register/`, { email, password }, this.httpOptions).pipe(
+    return this.http.post<{ access: string, refresh: string }>(`${this.rootUrl}/auth/register/`, { email, password }, this.httpOptions).pipe(
       tap(response => {
-        console.log(response)
-        const user = new User({ email: credentials.email, token: response.token });
+        const user = new User({ email: credentials.email, token: response.access, refreshToken: response.refresh });
         localStorage.setItem('user', JSON.stringify(user));
         this.userSubject.next(user);
       })
@@ -88,7 +87,7 @@ export class AuthService {
   checkToken() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
-      const myRawToken = user.token;
+      const myRawToken = user.access;
       const decodedToken = jwtHelper.decodeToken(myRawToken);
       const expirationDate = jwtHelper.getTokenExpirationDate(myRawToken);
       const isExpired = jwtHelper.isTokenExpired(myRawToken);
@@ -98,15 +97,13 @@ export class AuthService {
   }
 
   refreshToken() {
-    let credentials = null;
     if (this.userValue) {
-      const { token, refreshToken } = this.userValue;
-      credentials = refreshToken ? refreshToken : token;
-      return this.http.post<{ token: string }>(`${this.rootUrl}/api-token-refresh/`, { credentials }, this.httpOptions).pipe(
+      const refresh = this.userValue.refreshToken;
+      return this.http.post<{ access: string }>(`${this.rootUrl}/api/token/refresh/`, { refresh }, this.httpOptions).pipe(
         tap(response => {
-          const user = new User({ ...this.userValue, refreshToken: response.token });
+          const user = new User({ ...this.userValue, token: response.access });
           localStorage.setItem('user', JSON.stringify(user));
-        })
+        }),
       );
     }
 

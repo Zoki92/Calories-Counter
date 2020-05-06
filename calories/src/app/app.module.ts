@@ -7,6 +7,7 @@ import { SharedModule } from './shared/shared.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { JwtInterceptorInterceptor } from './authentication/jwt-interceptor.interceptor';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { LoadingScreenInterceptor } from './shared/loading-screen.interceptor';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { AuthenticationModule } from './authentication/authentication.module';
     HttpClientModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingScreenInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

@@ -8,7 +8,7 @@ import {
 } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
-import { switchMap, filter, take, catchError } from 'rxjs/operators';
+import { switchMap, filter, take, catchError, tap } from 'rxjs/operators';
 
 @Injectable()
 export class JwtInterceptorInterceptor implements HttpInterceptor {
@@ -26,6 +26,9 @@ export class JwtInterceptorInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError(error => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
+          if (error.error.detail === 'No active account found with the given credentials') {
+            return throwError(error);
+          }
           return this.handle401Error(request, next);
         } else {
           return throwError(error);
@@ -38,15 +41,11 @@ export class JwtInterceptorInterceptor implements HttpInterceptor {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
       return this.authService.refreshToken().pipe(
-        switchMap((token: any) => {
+        switchMap((response: any) => {
           this.isRefreshing = false;
-          this.refreshTokenSubject.next(token);
-          return next.handle(this.addToken(request, token));
+          this.refreshTokenSubject.next(response.access);
+          return next.handle(this.addToken(request, response.access));
         }),
-        catchError(err => {
-          this.authService.logout();
-          return throwError(err);
-        })
       );
     }
     else {

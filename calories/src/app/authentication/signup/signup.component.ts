@@ -45,13 +45,15 @@ export class SignupComponent implements OnInit {
   }
 
   onSubmit() {
+    this.alertService.clear();
+
     if (this.authForm.invalid) {
       return;
     }
     this.authService.register(this.authForm.value).subscribe({
       next: response => {
-        this.alertService.success("You have successfully create an account!", { keepAfterRouteChange: true, autoClose: true });
-        this.router.navigateByUrl('/home')
+        this.alertService.success("You have successfully created an account!", { keepAfterRouteChange: true, autoClose: true });
+        this.router.navigateByUrl('/home');
       },
       error: err => {
         if (!err.status) {

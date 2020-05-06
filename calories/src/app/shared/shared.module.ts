@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { InputComponent } from './input/input.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AlertComponent } from './alert/alert.component';
+import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
 
 
 
 @NgModule({
-  declarations: [InputComponent, AlertComponent],
+  declarations: [InputComponent, AlertComponent, LoadingScreenComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -15,6 +16,7 @@ import { AlertComponent } from './alert/alert.component';
   exports: [
     InputComponent,
     AlertComponent,
+    LoadingScreenComponent,
   ]
 })
 export class SharedModule { }

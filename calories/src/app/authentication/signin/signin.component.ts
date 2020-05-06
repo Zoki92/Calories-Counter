@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { AlertService } from 'src/app/shared/alert.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-signin',
@@ -46,13 +47,14 @@ export class SigninComponent implements OnInit {
     }
     this.loading = true;
     return this.authService.signin(this.authForm.value).subscribe({
-      next: () => {
-        this.router.navigateByUrl('/home')
+      next: response => {
+        this.router.navigateByUrl('/home');
         this.alertService.success("You have signed in!", { keepAfterRouteChange: true, autoClose: true });
       },
       error: ({ error }) => {
-        this.alertService.error(error.non_field_errors);
-        if (error.non_field_errors) {
+        this.loading = false;
+        this.alertService.error(error.detail);
+        if (error.detail) {
           this.authForm.setErrors({
             credentials: true
           });

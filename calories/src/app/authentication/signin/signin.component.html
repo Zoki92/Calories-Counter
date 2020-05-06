@@ -12,5 +12,13 @@
     </div>
     <div>
         <button [disabled]="authForm.invalid" class="ui submit button primary">Submit</button>
+
+        <div class="ui segment" *ngIf="loading">
+            <div class="ui active inverted dimmer">
+                <div class="ui text loader">Loading Data</div>
+            </div>
+            <p></p>
+        </div>
+
     </div>
 </form>

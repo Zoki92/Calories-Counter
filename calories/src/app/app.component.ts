@@ -15,11 +15,8 @@ export class AppComponent {
 
   constructor(private authService: AuthService, private router: Router, private alertService: AlertService) {
     this.authService.user.subscribe(x => this.user = x);
-
-    if (this.user) {
-      const { isExpired } = this.authService.checkToken();
-      this.router.navigateByUrl('/home')
-    }
+    this.router.navigateByUrl('/home');
+    console.log("here app comp");
   }
 
   logout() {
