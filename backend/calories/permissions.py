@@ -2,8 +2,17 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
 class UserTypesPermission(BasePermission):
-
-    message = 'Only Owner of object can update/view/delete meals, unless he is an admin or superuser'
+    """
+    Custom permission class for the meal objects, 
+    superuser has ability to add/update/remove objects,
+    except some other superuser
+    manager has ability to add/update/remove objects that
+    belong to other users
+    users have ability to only add/update/remove their
+    own objects
+    """
+    message = 'Only Owner of object can update/view/delete meals, \
+    unless he is an admin or superuser'
 
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:

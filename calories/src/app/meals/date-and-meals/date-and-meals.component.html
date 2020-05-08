@@ -1,0 +1,37 @@
+<div class="content">
+    <div class="ui grid">
+        <div class="eight wide column">
+            <div class="header">
+                {{ dateAndMeals.date | date }}
+            </div>
+            <div class="ui card" *ngFor="let meal of dateAndMeals.meals" [ngClass]="caloriesOutput">
+                <div class="content">
+                    <div class="header">{{ meal.time_created | date: 'shortTime' }}</div>
+                    <div class="description">
+                        <p>{{ meal.text }}</p>
+                    </div>
+                </div>
+                <div class="extra content">
+                    <i class="heart icon"></i>
+                    {{ meal.num_calories | number:'1.0-0' }} Calories
+                </div>
+            </div>
+        </div>
+        <div class="eight wide column">
+            <div (click)="showModal=true" class="ui teal button add">Add Meal</div>
+            <form (ngSubmit)="onSubmit()" class="ui form eight" [formGroup]="caloryEntryForm">
+                <app-input inputType="number" label="Maximum Calories" [control]="caloryEntryForm.get('caloriesInput')">
+                </app-input>
+                <p>Total calories for today: {{ calculatedCalories }}</p>
+
+                <button class="ui submit button primary">Submit</button>
+                <button (click)="reset()" class="ui button">Reset</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<app-modal (dismiss)="showModal=false" *ngIf="showModal">
+    <h3 modalTitle>Compose</h3>
+    <app-add-meal-form [date]="dateAndMeals.date"></app-add-meal-form>
+</app-modal>

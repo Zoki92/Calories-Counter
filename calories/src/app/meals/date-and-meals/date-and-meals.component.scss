@@ -1,0 +1,31 @@
+.green {
+    background: green;
+    color: white;
+}
+
+.red {
+    background: red;
+    color: #fff;
+}
+
+.header {
+    font-size: 2rem;
+    padding-bottom: 1rem;
+}
+
+.ui.grid {
+    margin: 0;
+    padding: 1rem 0;
+}
+
+.eight.wide {
+    padding: 1rem 0 !important;
+}
+
+.button.add {
+    float: right;
+    margin-bottom: 1rem;
+    z-index: 1;
+    display: block;
+    position: relative;
+}

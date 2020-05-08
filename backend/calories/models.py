@@ -7,6 +7,10 @@ User = get_user_model()
 
 
 class Meal(models.Model):
+
+    class Meta:
+        ordering = ('time_created',)
+
     text = models.TextField()
     num_calories = models.DecimalField(
         decimal_places=2,

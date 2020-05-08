@@ -21,19 +21,26 @@ class MealViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated, UserTypesPermission)
     serializer_class = MealSerializer
 
-    # need to implement this method to be able to use permissions on object level
-    # it's in the documentation
     def get_object(self):
+        """
+        need to implement this method to be able to use permissions on object level
+        """
         obj = get_object_or_404(Meal, pk=self.kwargs["pk"])
         self.check_object_permissions(self.request, obj)
         return obj
 
     def list(self, request):
+        """
+        showing meals for user
+        """
         qs = Meal.objects.filter(owner=request.user)
         serialized = self.serializer_class(qs, many=True)
         return Response(serialized.data)
 
     def create(self, request):
+        """
+        creating meal objects
+        """
         owner = request.user
         serializer = MealSerializer(data=request.data)
         if serializer.is_valid():
@@ -48,7 +55,10 @@ class MealViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    def update(self, request, pk=None):
+    def update(self, request):
+        """
+        updating meal object
+        """
         obj = self.get_object()
         serializer = MealSerializer(obj, data=request.data, partial=True)
 
@@ -64,7 +74,10 @@ class MealViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request):
+        """
+        delete endpoint for the meal obj
+        """
         obj = self.get_object()
         obj.delete()
         return Response(
